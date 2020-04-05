@@ -5,17 +5,19 @@ const morgan = require('morgan');
 const puppeteer = require('puppeteer');
 
 const JUKED_URL = 'https://juked.gg/wc3';
+const JUKED_XPATH = '/html/body/div[1]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img';
+
+const RARLAB_URL = 'https://www.rarlab.com/themes.htm';
+const RARLAB_XPATH = '/html/body/table/tbody/tr/td[2]/p[2]/img';
 
 async function scrapeData(url) {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   // await page.waitForNavigation({ waitUntil: "domcontentloaded"});
-  await page.goto(JUKED_URL);
-  // await page.waitForSelector('.juked125');
-  // const el = await page.$('.juked125');
-  await page.waitForXPath('/html/body/div[1]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');
-  const [el] = await page.$x('/html/body/div[1]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');
-  // const [el] = await page.$x('//*[@id="root"]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');
+  await page.goto(RARLAB_URL);
+
+  await page.waitForXPath(RARLAB_XPATH);
+  const [el] = await page.$x(RARLAB_XPATH);
   console.log('el', el);
   const src = await el.getProperty('src');
   const srcTxt = await src.jsonValue();

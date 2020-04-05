@@ -26,7 +26,7 @@ async function scrapeData(url) {
   await page.goto(JUKED_URL, {timeout: 0, waitUntil: 'load' });
   // const [el] = await frames[0].$x(JUKED_XPATH);
   // console.log('el', el);
-  // await page.waitForXPath(JUKED_XPATH);
+  await page.waitForXPath(JUKED_XPATH, {timeout: 0});
   const [el] = await page.$x(JUKED_XPATH);
 
   const src = await el.getProperty('src');

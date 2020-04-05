@@ -7,7 +7,7 @@ const puppeteer = require('puppeteer');
 const JUKED_URL = 'https://juked.gg/wc3';
 
 async function scrapeData(url) {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({headless: false});
   const page = await browser.newPage();
 
   // await page.waitForNavigation({ waitUntil: "domcontentloaded"});

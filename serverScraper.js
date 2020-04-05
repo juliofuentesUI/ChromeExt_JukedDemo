@@ -20,9 +20,7 @@ async function scrapeData(url) {
       '--disable-accelerated-2d-canvas',
       '--no-zygote',
       '--disable-gpu'
-    ],
-    headless: false,
-    devtools: true
+    ]
   };
   const browser = await puppeteer.launch(options);
   const page = await browser.newPage();

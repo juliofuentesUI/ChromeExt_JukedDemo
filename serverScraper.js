@@ -7,13 +7,12 @@ const puppeteer = require('puppeteer');
 const JUKED_URL = 'https://juked.gg/wc3';
 
 async function scrapeData(url) {
-  const browser = await puppeteer.launch({headless: false});
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
-
   // await page.waitForNavigation({ waitUntil: "domcontentloaded"});
-  await page.goto(JUKED_URL, { waitUntil: 'domcontentloaded'});
-  const userAgent = await page.evaluate(() => navigator.userAgent);
-  console.log('userAgent is :' , userAgent);
+  await page.goto(JUKED_URL);
+  // await page.waitForSelector('.juked125');
+  // const el = await page.$('.juked125');
   await page.waitForXPath('/html/body/div[1]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');
   const [el] = await page.$x('/html/body/div[1]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');
   // const [el] = await page.$x('//*[@id="root"]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');

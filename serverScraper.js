@@ -11,12 +11,10 @@ const RARLAB_URL = 'https://www.rarlab.com/themes.htm';
 const RARLAB_XPATH = '/html/body/table/tbody/tr/td[2]/p[2]/img';
 
 async function scrapeData(url) {
-  // const browser = await puppeteer.launch({headless: false, devtools: true});
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({headless: false, devtools: true});
+  // const browser = await puppeteer.launch();
   const page = await browser.newPage();
-
   // await page.waitForNavigation({ waitUntil: "domcontentloaded"});
-  await page.goto(JUKED_URL);
   await page.setRequestInterception(true);
   page.on('request', request => {
     if (request.resourceType() === 'image') {
@@ -25,6 +23,9 @@ async function scrapeData(url) {
       request.continue();
     }
   });
+  await page.goto(JUKED_URL, {timeout: 0, waitUntil: 'load' });
+  // const [el] = await frames[0].$x(JUKED_XPATH);
+  // console.log('el', el);
   await page.waitForXPath(JUKED_XPATH);
   const [el] = await page.$x(JUKED_XPATH);
 

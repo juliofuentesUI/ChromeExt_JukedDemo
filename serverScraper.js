@@ -24,7 +24,6 @@ async function scrapeData(url) {
   };
   const browser = await puppeteer.launch(options);
   const page = await browser.newPage();
-  // await page.waitForNavigation({ waitUntil: "domcontentloaded"});
   // await page.setRequestInterception(true);
   // page.on('request', async request => {
   //   if (request.resourceType() === 'image') {
@@ -36,12 +35,10 @@ async function scrapeData(url) {
   console.log('Visiting JUKED_URL...');
   await page.goto(JUKED_URL, {waitUntil: 'load'});
   // console.log('Waiting for XPath To Resolve...');
-  return { hi: 'hihihi'};
-  // // const [el] = await frames[0].$x(JUKED_XPATH);
-  // // console.log('el', el);
   // await page.waitForXPath(JUKED_XPATH);
-  // const [el] = await page.$x(JUKED_XPATH);
-  // console.log('XPath Resolved...');
+  const [el] = await page.$x(JUKED_XPATH);
+  console.log('XPath Resolved...');
+  return { hi: 'hihihi'};
 
   // const src = await el.getProperty('src');
   // const srcTxt = await src.jsonValue();

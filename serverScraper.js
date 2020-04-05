@@ -10,7 +10,8 @@ async function scrapeData(url) {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  await page.goto(JUKED_URL);
+  // await page.waitForNavigation({ waitUntil: "domcontentloaded"});
+  await page.goto(JUKED_URL, { waitUntil: 'domcontentloaded'});
   await page.waitForXPath('/html/body/div[1]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');
   const [el] = await page.$x('/html/body/div[1]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');
   // const [el] = await page.$x('//*[@id="root"]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');

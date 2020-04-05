@@ -12,6 +12,8 @@ async function scrapeData(url) {
 
   // await page.waitForNavigation({ waitUntil: "domcontentloaded"});
   await page.goto(JUKED_URL, { waitUntil: 'domcontentloaded'});
+  const userAgent = await page.evaluate(() => navigator.userAgent);
+  console.log('userAgent is :' , userAgent);
   await page.waitForXPath('/html/body/div[1]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');
   const [el] = await page.$x('/html/body/div[1]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');
   // const [el] = await page.$x('//*[@id="root"]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img');
@@ -45,7 +47,7 @@ app.get('/', async (req, res) => {
   res.status(200).send(output);
 });
 
-let PORT = 1128;
+let PORT = 3000;
 
 app.listen(PORT, function() {
   console.log(`listening on port ${PORT}`);

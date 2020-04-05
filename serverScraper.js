@@ -11,14 +11,23 @@ const RARLAB_URL = 'https://www.rarlab.com/themes.htm';
 const RARLAB_XPATH = '/html/body/table/tbody/tr/td[2]/p[2]/img';
 
 async function scrapeData(url) {
+  // const browser = await puppeteer.launch({headless: false, devtools: true});
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  // await page.waitForNavigation({ waitUntil: "domcontentloaded"});
-  await page.goto(RARLAB_URL);
 
-  await page.waitForXPath(RARLAB_XPATH);
-  const [el] = await page.$x(RARLAB_XPATH);
-  console.log('el', el);
+  // await page.waitForNavigation({ waitUntil: "domcontentloaded"});
+  await page.goto(JUKED_URL);
+  await page.setRequestInterception(true);
+  page.on('request', request => {
+    if (request.resourceType() === 'image') {
+      request.abort();
+    } else {
+      request.continue();
+    }
+  });
+  await page.waitForXPath(JUKED_XPATH);
+  const [el] = await page.$x(JUKED_XPATH);
+
   const src = await el.getProperty('src');
   const srcTxt = await src.jsonValue();
 
@@ -44,7 +53,7 @@ app.get('/', async (req, res) => {
   //call puppeteer function here,
   //also hardcode the URL before dynamic.
   let output = await scrapeData();
-  console.log('this has to run AFTER scraping');
+  console.log('DATA HAS BEEN SCRAPED');
   res.status(200).send(output);
 });
 

@@ -7,6 +7,8 @@ const puppeteer = require('puppeteer');
 const JUKED_URL = 'https://juked.gg/wc3';
 const JUKED_XPATH = '/html/body/div[1]/div/div[3]/div[1]/div/div[2]/div[2]/div[1]/div[1]/img';
 
+const JUKED_DATE_XPATH = '/html/body/div[1]/div/div[3]/div[3]/div/div[2]/div[1]/div[1]/span[2]';
+
 const RARLAB_URL = 'https://www.rarlab.com/themes.htm';
 const RARLAB_XPATH = '/html/body/table/tbody/tr/td[2]/p[2]/img';
 
@@ -37,10 +39,12 @@ async function scrapeData(url) {
   // console.log('Waiting for XPath To Resolve...');
   // await page.waitForXPath(JUKED_XPATH);
   // const [el] = await page.$x(JUKED_XPATH);
-  const el = await page.waitForXPath(JUKED_XPATH);
-  const src = await el.getProperty('src');
-  console.log('XPath Resolved...');
-  return { hi: 'hihihi'};
+  await page.waitForXPath(JUKED_DATE_XPATH);
+  const [el] = await page.$x(JUKED_DATE_XPATH);
+  let text = await page.evaluate(el => el.textContent, el);
+
+  console.log('text is', text);
+  return {text};
 
   // const srcTxt = await src.jsonValue();
 

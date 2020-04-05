@@ -37,10 +37,10 @@ async function scrapeData(url) {
   // console.log('Waiting for XPath To Resolve...');
   // await page.waitForXPath(JUKED_XPATH);
   const [el] = await page.$x(JUKED_XPATH);
+  const src = await el.getProperty('src');
   console.log('XPath Resolved...');
   return { hi: 'hihihi'};
 
-  // const src = await el.getProperty('src');
   // const srcTxt = await src.jsonValue();
 
   // console.log('srcText here : ', srcTxt);

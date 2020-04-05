@@ -12,22 +12,35 @@ const RARLAB_XPATH = '/html/body/table/tbody/tr/td[2]/p[2]/img';
 
 async function scrapeData(url) {
   // const browser = await puppeteer.launch({headless: false, devtools: true});
-  const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-gpu']});
+  console.log('Launching Puppeteer browser...');
+  const options = {
+    args: [
+      '--no-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-zygote',
+      '--disable-gpu'
+    ]
+  };
+  const browser = await puppeteer.launch(options);
   const page = await browser.newPage();
   // await page.waitForNavigation({ waitUntil: "domcontentloaded"});
   await page.setRequestInterception(true);
-  page.on('request', request => {
+  page.on('request', async request => {
     if (request.resourceType() === 'image') {
-      request.abort();
+      await request.abort();
     } else {
-      request.continue();
+      await request.continue();
     }
   });
-  await page.goto(JUKED_URL, {waitUntil: 'load' });
+  console.log('Visiting JUKED_URL...');
+  await page.goto(JUKED_URL);
+  console.log('Waiting for XPath To Resolve...');
   // const [el] = await frames[0].$x(JUKED_XPATH);
   // console.log('el', el);
-  await page.waitForXPath(JUKED_XPATH, {timeout: 0});
+  await page.waitForXPath(JUKED_XPATH);
   const [el] = await page.$x(JUKED_XPATH);
+  console.log('XPath Resolved...');
 
   const src = await el.getProperty('src');
   const srcTxt = await src.jsonValue();

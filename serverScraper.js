@@ -20,7 +20,9 @@ async function scrapeData(url) {
       '--disable-accelerated-2d-canvas',
       '--no-zygote',
       '--disable-gpu'
-    ]
+    ],
+    headless: false,
+    devtools: true
   };
   const browser = await puppeteer.launch(options);
   const page = await browser.newPage();
@@ -37,7 +39,7 @@ async function scrapeData(url) {
   // console.log('Waiting for XPath To Resolve...');
   // await page.waitForXPath(JUKED_XPATH);
   // const [el] = await page.$x(JUKED_XPATH);
-  const [el] = await page.waitForXPath(JUKED_XPATH);
+  const el = await page.waitForXPath(JUKED_XPATH);
   const src = await el.getProperty('src');
   console.log('XPath Resolved...');
   return { hi: 'hihihi'};

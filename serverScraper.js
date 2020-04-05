@@ -11,8 +11,8 @@ const RARLAB_URL = 'https://www.rarlab.com/themes.htm';
 const RARLAB_XPATH = '/html/body/table/tbody/tr/td[2]/p[2]/img';
 
 async function scrapeData(url) {
-  const browser = await puppeteer.launch({headless: false, devtools: true});
-  // const browser = await puppeteer.launch();
+  // const browser = await puppeteer.launch({headless: false, devtools: true});
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
   // await page.waitForNavigation({ waitUntil: "domcontentloaded"});
   await page.setRequestInterception(true);

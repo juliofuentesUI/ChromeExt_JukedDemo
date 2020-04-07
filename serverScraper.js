@@ -2,10 +2,45 @@
 const puppeteer = require('puppeteer');
 
 const JUKED_URL = 'https://juked.gg/csgo';
-const CSGO_CALENDAR_NODE = '#calendar';
+const CALENDAR_NODE = '#calendar';
+
+async function scrapeData(url) {
+  console.log('Launching Puppeteer browser...');
+  const options = {
+    args: [
+      '--no-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-zygote',
+      '--disable-gpu'
+    ]
+  };
+  try {
+    const browser = await puppeteer.launch({
+      headless: false, 
+      devtools: true, 
+      defaultViewport: {
+        width: 1060,
+        height: 1006
+      }});
+    const page = await browser.newPage();
+    await page.goto(url || JUKED_URL, {waitUntil: 'load'});
+    let calendarHandle = await page.waitForSelector(CALENDAR_NODE);
+    await page.waitFor(5000);
+    console.log('Beginning Traversal');
+    let allEvents = await calendarHandle.evaluate(traverseCalendar);
+    console.log('Data scrape complete');
+  
+    browser.close();
+    
+    return {allEvents};
+  
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const traverseCalendar = (calendar) => {
-  //native calendar. Now traverse it with jQUERY or native javascript. your call. 
   //DONT FORGET. THIS IS EXECUTIGN NOT IN NODE CONTEXT, BUT PAGE CONTEXT INSIDE BROWSER.
   console.log('Function TraverseCalendar executing...');
   let eventDays = calendar.firstChild.children[1].children;
@@ -71,39 +106,5 @@ const traverseCalendar = (calendar) => {
 };
 
 
-async function scrapeData(url) {
-  console.log('Launching Puppeteer browser...');
-  const options = {
-    args: [
-      '--no-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-zygote',
-      '--disable-gpu'
-    ]
-  };
-  try {
-    const browser = await puppeteer.launch({
-      headless: false, 
-      devtools: true, 
-      defaultViewport: {
-        width: 1060,
-        height: 1006
-      }});
-    const page = await browser.newPage();
-    await page.goto(url ? url : JUKED_URL, {waitUntil: 'load'});
-    let calendarHandle = await page.waitForSelector(CSGO_CALENDAR_NODE);
-    await page.waitFor(5000);
-    console.log('BEGIN TRAVERSAL');
-    let allEvents = await calendarHandle.evaluate(traverseCalendar);
-  
-    browser.close();
-    
-    return {allEvents};
-  
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 module.exports = { scrapeData };

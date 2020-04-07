@@ -2,7 +2,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-const puppeteer = require('puppeteer');
 const { scrapeData } = require('./serverScraper.js');
 
 let app = express();
@@ -19,18 +18,12 @@ app.all('/*',(req, res, next) => {
 
 
 app.get('/', async (req, res) => {
-  //call puppeteer function here,
-  //also hardcode the URL before dynamic.
   let output = await scrapeData();
-  console.log('DATA HAS BEEN SCRAPED');
   res.status(200).send(output);
 });
 
 app.get('/lol', async (req, res) => {
-  //call puppeteer function here,
-  //also hardcode the URL before dynamic.
   let output = await scrapeData('https://juked.gg/lol');
-  console.log('DATA HAS BEEN SCRAPED');
   res.status(200).send(output);
 });
 

@@ -15,13 +15,10 @@ const traverseCalendar = (calendar) => {
   let scrapedData = [];
   for (let day of eventDays) {
     scrapedData.push(extractEventInfo(day));
-    // console.log(day.children[1].firstChild.children);
 
-    // console.log(day.children[1].firstChild.children);
   }
   console.log('scrapedData is', scrapedData);
-  // remember at some point to check for list length to be 7 or 8. this will dictate a lot. 
-  return null
+  return scrapedData;
 
   function extractEventInfo(day) {
     console.log('extractEventInfo is running! day value is : ', day);
@@ -29,6 +26,8 @@ const traverseCalendar = (calendar) => {
     let nameOfDay = day.id;
     let allEvents = [];
     for(let event of events) {
+      //WRITE UNIVERSAL SELECTORS HERE
+
       if (event.children.length === 7) {
         //Standard and most commonly seen calendar event.
         let eventData = {};
@@ -41,6 +40,7 @@ const traverseCalendar = (calendar) => {
         eventData.team2Name = event.children[3].querySelector('.right').innerText; //extracts second teams name 'TIGER'
         eventData.team1Logo = event.children[3].querySelector('img').src; //extracts first teams logo url https://juked.gg/images/playerPlaceHolder.png
         eventData.team1Logo = event.children[3].querySelectorAll('img')[1].src; //extracts second teams logo url https://juked.gg/images/playerPlaceHolder.png
+        eventData.urlToStream = event.children[event.children.length - 1].href; //extracts URL to stream 
         allEvents.push(eventData);
   
       } else if (event.children.length === 6) {
@@ -56,6 +56,7 @@ const traverseCalendar = (calendar) => {
         eventData.team2Name = event.children[4].querySelector('.right').innerText; //extracts second teams name 'TIGER'
         eventData.team1Logo = event.children[4].querySelector('img').src; //extracts first teams logo url https://juked.gg/images/playerPlaceHolder.png
         eventData.team1Logo = event.children[4].querySelectorAll('img')[1].src; //extracts second teams logo url https://juked.gg/images/playerPlaceHolder.png
+        eventData.urlToStream = event.children[event.children.length - 1].href; //extracts URL to stream 
         allEvents.push(eventData);
   
       } else if (event.children.length === 8) {
@@ -70,6 +71,7 @@ const traverseCalendar = (calendar) => {
         eventData.team2Name = event.children[4].querySelector('.right').innerText; //extracts second teams name 'TIGER'
         eventData.team1Logo = event.children[4].querySelector('img').src; //extracts first teams logo url https://juked.gg/images/playerPlaceHolder.png
         eventData.team1Logo = event.children[4].querySelectorAll('img')[1].src; //extracts second teams logo url https://juked.gg/images/playerPlaceHolder.png
+        eventData.urlToStream = event.children[event.children.length - 1].href; //extracts URL to stream 
         allEvents.push(eventData);
   
       }
@@ -110,7 +112,7 @@ async function scrapeData(url) {
     //   }
     // });
     console.log('Visiting JUKED_URL...');
-    await page.goto(JUKED_URL, {waitUntil: 'load'});
+    await page.goto(url ? url : JUKED_URL, {waitUntil: 'load'});
     console.log('Finished Loading Completely');
     // console.log('Waiting for XPath To Resolve...');
     // await page.waitForXPath(JUKED_XPATH);
@@ -125,13 +127,9 @@ async function scrapeData(url) {
     let allEvents = await calendarHandle.evaluate(traverseCalendar);
   
     // browser.close();
+    
+    return {allEvents};
   
-  
-    // const srcTxt = await src.jsonValue();
-  
-    // console.log('srcText here : ', srcTxt);
-    // browser.close();
-    // return {srcTxt};
   } catch (error) {
     console.error(error);
   }

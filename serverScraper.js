@@ -4,7 +4,8 @@ const puppeteer = require('puppeteer');
 const JUKED_URL = 'https://juked.gg/csgo';
 const CALENDAR_NODE = '#calendar';
 
-async function scrapeData(url) {
+
+const scrapeData = async (url) => {
   console.log('Launching Puppeteer browser...');
   const options = {
     args: [
@@ -15,20 +16,19 @@ async function scrapeData(url) {
       '--disable-gpu'
     ]
   };
+
   try {
     const browser = await puppeteer.launch({
-      headless: false, 
-      devtools: true, 
       defaultViewport: {
         width: 1060,
         height: 1006
       }});
     const page = await browser.newPage();
     await page.goto(url || JUKED_URL, {waitUntil: 'load'});
-    let calendarHandle = await page.waitForSelector(CALENDAR_NODE);
+    const calendarHandle = await page.waitForSelector(CALENDAR_NODE);
     await page.waitFor(5000);
     console.log('Beginning Traversal');
-    let allEvents = await calendarHandle.evaluate(traverseCalendar);
+    const allEvents = await calendarHandle.evaluate(traverseCalendar);
     console.log('Data scrape complete');
   
     browser.close();
@@ -41,10 +41,10 @@ async function scrapeData(url) {
 };
 
 const traverseCalendar = (calendar) => {
-  //DONT FORGET. THIS IS EXECUTIGN NOT IN NODE CONTEXT, BUT PAGE CONTEXT INSIDE BROWSER.
+  //DONT FORGET. THIS IS EXECUTING IN PAGE CONTEXT, NOT NODE CONTEXT because EVAL 
   console.log('Function TraverseCalendar executing...');
-  let eventDays = calendar.firstChild.children[1].children;
-  let scrapedData = [];
+  const eventDays = calendar.firstChild.children[1].children;
+  const scrapedData = [];
   for (let day of eventDays) {
     scrapedData.push(extractEventInfo(day));
   }
@@ -52,11 +52,11 @@ const traverseCalendar = (calendar) => {
   return scrapedData;
 
   function extractEventInfo(day) {
-    let events = day.children[1].firstChild.children;
-    let nameOfDay = day.id;
-    let allEvents = [];
+    const events = day.children[1].firstChild.children;
+    const nameOfDay = day.id;
+    const allEvents = [];
     for(let event of events) {
-      let eventData = {};
+      const eventData = {};
       eventData.nameOfDay = nameOfDay; //extracts "Live Now" or "Tomorrow"
 
       switch(event.children.length) {

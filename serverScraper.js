@@ -24,18 +24,24 @@ const traverseCalendar = (calendar) => {
 
 const extractEventInfo = (day) => {
   let events = day.children[1].firstChild.children;
+  let nameOfDay = day.id;
+  let allEvents = [];
   for(let event of events) {
     if (event.children.length === 7) {
       //do stuff
+      let liveNow = 'Live Now' === nameOfDay;
       let eventData = {};
+      eventData.nameOfDay = nameOfDay; //extracts "Live Now" or "Tomorrow"
       eventData.timeTilStart = event.children[0].innerText; //extracts "2:00 am"
       eventData.nameOfGame = event.children[1].innerText; //extracts "CSGO"
       eventData.eventNameAndPrize = event.children[2].innerText; //extracts "NEX Play From Home Group B - Winners' match -$20,000"
       eventData.eventLogo = event.children[2].querySelector('img').src; // extracts "https://img.abiosgaming.com/games/cs-square-logo.png"
-      eventData.team1Name = event.children[3].querySelector('.left').innerText; //extracts first teams name 'ZIGMA'
-      eventData.team2Name = event.children[3].querySelector('.right').innerText; //extracts second teams name 'TIGER'
-      eventData.team1Logo = event.children[3].querySelector('img').src; //extracts first teams logo url https://juked.gg/images/playerPlaceHolder.png
-      eventData.team1Logo = event.children[3].querySelectorAll('img')[1].src; //extracts second teams logo url https://juked.gg/images/playerPlaceHolder.png
+      eventData.team1Name = event.children[liveNow ? 4 : 3].querySelector('.left').innerText; //extracts first teams name 'ZIGMA'
+      eventData.team2Name = event.children[liveNow ? 4 : 3].querySelector('.right').innerText; //extracts second teams name 'TIGER'
+      eventData.team1Logo = event.children[liveNow ? 4 : 3].querySelector('img').src; //extracts first teams logo url https://juked.gg/images/playerPlaceHolder.png
+      eventData.team1Logo = event.children[liveNow ? 4 : 3].querySelectorAll('img')[1].src; //extracts second teams logo url https://juked.gg/images/playerPlaceHolder.png
+
+      allEvents.push(eventData);
     } else if (event.children.length === 8) {
       //the event has a timer
     }

@@ -1,7 +1,6 @@
 console.log('BACKGROUND.JS EXECUTED');
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log(' AM I FUCKING RUNNING, I AM BACKGROUND.JS');
     if (request.fetchWarcraftDates) {
         fetch('https://juked.gg/wc3')
         .then(response => {

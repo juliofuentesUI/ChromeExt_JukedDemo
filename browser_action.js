@@ -11,3 +11,5 @@ let fetchButton = document.getElementById('loadWc3');
 fetchButton.addEventListener('click', (event) => {
     fetchDates();
 });
+
+

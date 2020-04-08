@@ -1,12 +1,13 @@
 //this runs on server , will require puppeteer
 const puppeteer = require('puppeteer');
 
-const JUKED_URL = 'https://juked.gg/csgo';
+const BASE_URL = "https://juked.gg"
 const CALENDAR_NODE = '#calendar';
 
 
-const scrapeData = async (url) => {
+const scrapeData = async (game) => {
   console.log('Launching Puppeteer browser...');
+  const GAME_URL = `${BASE_URL}/${game}`;
   const options = {
     args: [
       '--no-sandbox',
@@ -24,7 +25,7 @@ const scrapeData = async (url) => {
         height: 1006
       }});
     const page = await browser.newPage();
-    await page.goto(url || JUKED_URL, {waitUntil: 'load'});
+    await page.goto(GAME_URL, {waitUntil: 'load'});
     const calendarHandle = await page.waitForSelector(CALENDAR_NODE);
     await page.waitFor(5000);
     console.log('Beginning Traversal');

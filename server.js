@@ -1,8 +1,7 @@
-//this runs on server , will require puppeteer
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-const { scrapeData } = require('./serverScraper.js');
+const db = require('./database.js');
 
 let app = express();
 
@@ -17,13 +16,15 @@ app.all('/*',(req, res, next) => {
 });
 
 
-app.get('/', async (req, res) => {
-  let output = await scrapeData();
+app.get('/csgo', async (req, res) => {
+  // let output = await scrapeData('https://juked.gg/csgo');
+  let output = await db.fetchUpcomingEvents('https://juked.gg/csgo');
   res.status(200).send(output);
 });
 
 app.get('/lol', async (req, res) => {
-  let output = await scrapeData('https://juked.gg/lol');
+  // let output = await scrapeData('https://juked.gg/lol');
+  let output = await db.fetchUpcomingEvents('https://juked.gg/lol');
   res.status(200).send(output);
 });
 

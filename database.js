@@ -4,44 +4,25 @@ const DB_NAME = "JUKED-WEBSCRAPE-DATA-DB";
 const { scrapeData } = require('./serverScraper.js');
 
 
-
-
-const client = new MongoClient(URI, { useNewUrlParser: true, useUnifiedTopology: true });
 let db;
 let collection;
+initializeConnection();
 
-client.connect(error => {
-    console.log('Connected successfully');
-    db = client.db(DB_NAME);
-    testUpdate();
-
-    // clearAllCollections(db);
-    //clear database for demo purposes.
-    // collection.deleteMany({}, (error, result) => {
-        // if (error) console.log('oops', error);
-        // if (result) console.log('Successfully deleted');
-    // });
-    // collection.insertMany([event1, event2], (error, result) => {
-        // if (error) console.log('oops', error);
-        // if (result) console.log('result', result);
-    // });
-    // do shit here
-});
-
-async function fetchUpcomingEvents(game) {
-    //use webscraper here.
-    let gameEventList = await scrapeData(game);
-    // updateCollection(gameEventList, game);
-    return gameEventList;
-};
+function initializeConnection() {
+    const client = new MongoClient(URI, { useNewUrlParser: true, useUnifiedTopology: true });
+    client.connect(error => {
+        console.log('Connected to MongoAtlas successfully');
+        db = client.db(DB_NAME);
+        clearAllCollections(db).then(() => {
+            fetchUpcomingEvents('csgo')
+        })
+    });
+}
 
 function updateCollection(gameEventList, game) {
-    //shape of data is like this gameEventlist.allEvents is an array []
-    //each Day like today tmmrw live now is a sub array of allEvents [[<Monday>], [<Tuesday>], [<Wednesday>]]
-    //inside Each sub array, are objects each represetngin an event of that day.
     let collection = db.collection(game);
     let bulkUpdateOps = [];
-    for(let day of gameEventList) {
+    for(let day of gameEventList.allEvents) {
         day.forEach((event) => {
             bulkUpdateOps.push({
                 updateOne: {
@@ -52,26 +33,32 @@ function updateCollection(gameEventList, game) {
             })
         });
     }
-    let result = collection.bulkWrite(bulkUpdateOps);
-    console.log('bulkUpdateOperation complete, the result is', result);
+    collection.bulkWrite(bulkUpdateOps).then((result) => {
+        console.log('bulkUpdateOperation complete, the result is', result);
+    });
 }
 
+async function fetchUpcomingEvents(game) {
+    //use webscraper here.
+    let gameEventList = await scrapeData(game);
+    console.log(gameEventList);
+    updateCollection(gameEventList, game);
+    return gameEventList;
+};
+
 function clearAllCollections(db) {
-    db.collections((error, collections) => {
-        collections.forEach(collection => {
-            collection.deleteMany({}, (err, result) => {
-                if (error) console.log('oops', error);
-                if (result) console.log('Deleted all documents');
+    return new Promise((resolve, reject) => {
+        db.collections((error, collections) => {
+            collections.forEach(collection => {
+                collection.deleteMany({}, (err, result) => {
+                    if (error) reject('Error occured');
+                    if (result) resolve('Cleared collection');
+                });
             });
         });
     });
-};
 
-function testUpdate() {
-    const CSGO_COLLECTION = db.collection('csgo');
-    console.log('We have handle on csgo collection, now aboutt o send update');
-    CSGO_COLLECTION.updateOne({eventNameAndPrize: 'julios fucking event' }, { $set: event1 }, {upsert: true});
-}
+};
 
 
 module.exports = { fetchUpcomingEvents }

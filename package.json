@@ -8,7 +8,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/juliofuentesUI/ChromeExt_JukedDemo.git"
+    "url": "git+https://github.com/juliofuentesUI/ChromeExt_JukedDemo.git",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",

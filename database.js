@@ -47,16 +47,35 @@ async function fetchUpcomingEvents(game) {
     return gameEventList;
 };
 
-function queryDatabase(game) {
+function queryDatabase(gameName) {
     return new Promise((resolve, reject) => {
-        console.log('Querying database...')
-        let collection = db.collection(game);
-        collection.find().toArray().then((docs, error) => {
-            if (error) reject(error);
-            if (docs) resolve(docs); 
+        console.log(`Querying database for ${gameName}...`);
+        checkCollectionExist(gameName)
+        .then(exists => {
+            let collection = db.collection(gameName);
+            console.log(collection);
+            collection.find().toArray().then((docs, error) => {
+                if (error) reject(error);
+                if (docs) resolve(docs); 
+            });
+        })
+        .catch(async doesNotExist => {
+           let gameEventList = await fetchUpcomingEvents(gameName);
+           return gameEventList;
         });
     })
 };
+
+function checkCollectionExist(gameName) {
+    console.log('Checking if exists...');
+    return new Promise((resolve, reject) => {
+        db.listCollections({name: gameName })
+            .next((error, collInfo) => {
+                if (error) reject(false);
+                if (collInfo) resolve(true);
+            })
+    });
+}
 
 function clearAllCollections(db) {
     console.log('Clearing all collections...');

@@ -60,20 +60,32 @@ function storeAndNotify(gameName, eventData) {
         if (chrome.runtime.lastError) console.log(`Error during set : ${chrome.runtime.lastError.message}`);
     });
     //now create a notification.
-    //filter through data and ONLY if you have live now games then notify.
-    chrome.notifications.create('', {
-        type: 'image',
-        imageUrl: './images/jukedgg_icon.png',
-        iconUrl: './images/jukedgg_icon.png',
-        title: `Live Stream for ${gameName}`,
-        message: 'Click to watch on JukedGG!',
-        buttons: [
-            { title: 'Go to Stream'},
-            { title: 'Ignore'}
-        ]
-    }, (id) => { currentNotificationId = id});
+    for (let stream of eventData) {
+        if (stream.nameOfDay === 'Live Now') {
+            currentNotificationLink = stream.urlToStream;
+            chrome.notifications.create('', {
+                type: 'image',
+                imageUrl: './images/jukedgg_icon.png',
+                iconUrl: './images/jukedgg_icon.png',
+                title: `Live Stream for ${gameName}`,
+                message: 'Click to watch on JukedGG!',
+                buttons: [
+                    { title: 'Go to Stream'},
+                    { title: 'Ignore'}
+                ]
+            }, (id) => { currentNotificationId = id});
+            break;
+        }
+    }
 };
 
+function getBlobUrl(url) {    
+    return fetch(url).then(response => {
+            return response.blob();
+        }).then(blob => {
+            return window.URL.createObjectURL(blob);
+        });
+};
 
 
 // chrome.runtime.onInstalled.addListener(function () {

@@ -1,20 +1,18 @@
-let associatedDomains = {
+const associatedDomains = {
     "https://www.hltv.org/": 'lol',
     "https://www.dotabuff.com/": 'dota2'
 };
 
 const LOCAL_SERVER_URL = 'http://localhost:3000';
+
 let currentNotificationId = null;
 let currentNotificationLink = 'https://juked.gg';
 
 chrome.webNavigation.onCompleted.addListener((tab) => {
-    //check to make sure its MAIN FRAME not subframe. mainframe is 0, rest are positive.
     console.log('webNavigation onCompleted event fired');
     let gameName = associatedDomains[tab.url];
     if (tab.frameId === 0 && gameName) {
-        //from here...do we ... hit the server endpoint?? check local storage??? 
-        // we should check local storage FIRST ... or check for 'live nows!' 
-        // make a query for live now! ONLY live now! the rest can go into calendar.
+
         fetch(`${LOCAL_SERVER_URL}/${gameName}`)
         .then(response => {
             return response.json();
@@ -31,20 +29,7 @@ chrome.webNavigation.onCompleted.addListener((tab) => {
 }, { url: [{ hostContains: 'hltv'}, {hostContains: 'dotabuff'}]});
 
 
-chrome.runtime.onSuspend.addListener(() => {
-    console.log('On Suspend event fired');
-});
-
-
-chrome.runtime.onSuspendCanceled.addListener(() => {
-    console.log('onSuspendCanceled fired');
-});
-
 chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
-    console.log('A notification button was clicked');
-    console.log('buttonIndex is', buttonIndex);
-    console.log('notificationId : ', notificationId);
-    console.log('currentNotificationId : ', currentNotificationId);
     if (notificationId === currentNotificationId) {
         if (buttonIndex === 0) {
             chrome.tabs.create({ 
@@ -78,27 +63,3 @@ function storeAndNotify(gameName, eventData) {
         }
     }
 };
-
-function getBlobUrl(url) {    
-    return fetch(url).then(response => {
-            return response.blob();
-        }).then(blob => {
-            return window.URL.createObjectURL(blob);
-        });
-};
-
-
-// chrome.runtime.onInstalled.addListener(function () {
-//     chrome.storage.sync.set({color: '#3aa757'}, function() {
-//         console.log('The color is green');
-//     });
-//     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-//         console.log('PAGE HAS BEEN CHANGED');
-//         chrome.declarativeContent.onPageChanged.addRules([{
-//             conditions: [new chrome.declarativeContent.PageStateMatcher({
-//                 pageUrl: {hostEquals: 'developer.chrome.com'}
-//             })],
-//             actions: [new chrome.declarativeContent.ShowPageAction()]
-//         }])
-//     })
-// });

@@ -24,24 +24,6 @@ app.get('/:game', async (req, res) => {
   }
 });
 
-// app.get('/csgo', async (req, res) => {
-//   let output = await db.queryDatabase('csgo');
-//   if (!output) {
-//     res.status(404).send('Data not found');
-//   } else {
-//     res.status(200).send(output);
-//   }
-// });
-
-// app.get('/lol', async (req, res) => {
-//   let output = await db.queryDatabase('lol');
-//   if (!output) {
-//     res.status(404).send('Data not found');
-//   } else {
-//     res.status(200).send(output);
-//   }
-// });
-
 let PORT = 3000;
 
 app.listen(PORT, function() {

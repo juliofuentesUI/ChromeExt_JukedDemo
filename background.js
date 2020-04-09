@@ -4,6 +4,8 @@ let associatedDomains = {
 };
 
 const LOCAL_SERVER_URL = 'http://localhost:3000';
+let currentNotificationId = null;
+let currentNotificationLink = null;
 
 chrome.webNavigation.onCompleted.addListener((tab) => {
     //check to make sure its MAIN FRAME not subframe. mainframe is 0, rest are positive.
@@ -19,11 +21,11 @@ chrome.webNavigation.onCompleted.addListener((tab) => {
         })
         .then(data => {
             console.log('DATA RECEIVED!', data);
+            storeAndNotify(gameName, data);
         })
         .catch(error => {
             console.log('error received', error);
         });
-        console.log('This domain exist in our associated domains object');
     }
 
 }, { url: [{ hostContains: 'hltv'}, {hostContains: 'dotabuff'}]});
@@ -38,8 +40,34 @@ chrome.runtime.onSuspendCanceled.addListener(() => {
     console.log('onSuspendCanceled fired');
 });
 
+chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
+    console.log('A notification button was clicked');
+    if (notificationId === currentNotificationId) {
+        if (buttonIndex === 0) {
+            window.open(currentNotificationLink);
+        }
+    }
+});
 
-
+function storeAndNotify(gameName, eventData) {
+    chrome.storage.local.set({ [gameName] : eventData}, (success) => {
+        if (success) console.log(`${gameName} data stored!`)
+        if (chrome.runtime.lastError) console.log(`Error during set : ${chrome.runtime.lastError.message}`);
+    });
+    //now create a notification.
+    //filter through data and ONLY if you have live now games then notify.
+    chrome.notifications.create('', {
+        type: "image",
+        imageUrl: 'urlGoesHere',
+        iconUrl: "./images/jukedgg_icon.png",
+        title: `Live Stream for ${gameName}`,
+        message: 'Click to watch on JukedGG!',
+        buttons: [
+            { title: 'Go to Stream'},
+            { title: 'Ignore'}
+        ]
+    }, (id) => {});
+};
 
 
 

@@ -2,7 +2,7 @@
     "name": "JukedGG Live Update ",
     "version": "1.0",
     "description": "Get updated when your favorite broadcast are live!",
-    "permissions": ["https://juked.gg/wc3","activeTab", "declarativeContent", "storage"],
+    "permissions": ["tabs", "activeTab", "webNavigation", "storage"],
     "background": {
       "scripts": ["background.js"],
       "persistent": false

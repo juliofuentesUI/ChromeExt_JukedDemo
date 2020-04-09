@@ -26,7 +26,7 @@ function updateCollection(gameEventList, game) {
         day.forEach((event) => {
             bulkUpdateOps.push({
                 updateOne: {
-                    "filter": { "eventNameAndPrize": event.eventNameAndPrize },
+                    "filter": { "eventNameAndPrize": event.eventNameAndPrize, "nameOfDay": event.nameOfDay },
                     "update": { $set: event },
                     "upsert": true
                 }
@@ -43,7 +43,6 @@ function updateCollection(gameEventList, game) {
 async function fetchUpcomingEvents(game) {
     //use webscraper here.
     let gameEventList = await scrapeData(game);
-    console.log(gameEventList);
     updateCollection(gameEventList, game);
     return gameEventList;
 };

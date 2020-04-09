@@ -1,33 +1,28 @@
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//     if (request.fetchWarcraftDates) {
-//         fetch('https://juked.gg/wc3')
-//         .then(response => {
-//             console.log(response);
-//             return response.text();
-//         })
-//         .then(html => {
-//             console.log('Sending response back as html...');
-//             sendResponse(html);
-//         })
-//         return true; 
-//     //return true MEANS, at least the way chrome works.
-//     //that this will EVENTUALLY Send the repsonse back asynchronously.
-//     }
-// });
-
-// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-//     console.log('changeInfo object', changeInfo);
-//     console.log('tab  object: ', tab);
-// });
 let associatedDomains = {
     "https://www.hltv.org/": 'lol',
     "https://www.dotabuff.com/": 'dota2'
 };
 
+const LOCAL_SERVER_URL = 'http://localhost:3000';
+
 chrome.webNavigation.onCompleted.addListener((tab) => {
     //check to make sure its MAIN FRAME not subframe. mainframe is 0, rest are positive.
     console.log('webNavigation onCompleted event fired');
-    if (tab.frameId === 0 && associatedDomains[tab.url]) {
+    let gameName = associatedDomains[tab.url];
+    if (tab.frameId === 0 && gameName) {
+        //from here...do we ... hit the server endpoint?? check local storage??? 
+        // we should check local storage FIRST ... or check for 'live nows!' 
+        // make a query for live now! ONLY live now! the rest can go into calendar.
+        fetch(`${LOCAL_SERVER_URL}/${gameName}`)
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            console.log('DATA RECEIVED!', data);
+        })
+        .catch(error => {
+            console.log('error received', error);
+        });
         console.log('This domain exist in our associated domains object');
     }
 

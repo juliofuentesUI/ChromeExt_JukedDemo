@@ -1,7 +1,8 @@
 const associatedDomains = {
     "https://www.hltv.org/": 'csgo',
     "https://www.dotabuff.com/": 'dota2',
-    "https://na.op.gg/": 'lol'
+    "https://na.op.gg/": 'lol',
+    "https://pro.eslgaming.com/r6/proleague/": 'r6'
 };
 
 const LOCAL_SERVER_URL = 'http://localhost:3000';
@@ -28,7 +29,7 @@ chrome.webNavigation.onCompleted.addListener((tab) => {
         });
     }
 
-}, { url: [{ hostContains: 'hltv'}, {hostContains: 'dotabuff'}, {hostContains: 'na.op'}]});
+}, { url: [{ hostContains: 'hltv'}, {hostContains: 'dotabuff'}, {hostContains: 'na.op'}, {pathContains: 'r6'}]});
 
 
 chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {

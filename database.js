@@ -12,39 +12,36 @@ function initializeConnection() {
     client.connect(error => {
         console.log('Connected to MongoAtlasDB');
         db = client.db(DB_NAME);
-        clearAllCollections(db).then(() => {
-            fetchUpcomingEvents('csgo');
-            fetchUpcomingEvents('lol');
-        })
     });
 }
 
 function updateCollection(gameEventList, game) {
-    let collection = db.collection(game);
-    let bulkUpdateOps = [];
-    for(let day of gameEventList.allEvents) {
-        day.forEach((event) => {
-            bulkUpdateOps.push({
-                updateOne: {
-                    "filter": { "eventNameAndPrize": event.eventNameAndPrize, "nameOfDay": event.nameOfDay },
-                    "update": { $set: event },
-                    "upsert": true
-                }
-            })
+    return new Promise((resolve, reject) => {
+        let collection = db.collection(game);
+        let bulkUpdateOps = [];
+        for(let day of gameEventList.allEvents) {
+            day.forEach((event) => {
+                bulkUpdateOps.push({
+                    updateOne: {
+                        "filter": { "eventNameAndPrize": event.eventNameAndPrize, "nameOfDay": event.nameOfDay },
+                        "update": { $set: event },
+                        "upsert": true
+                    }
+                })
+            });
+        }
+        collection.bulkWrite(bulkUpdateOps).then((result) => {
+            resolve(result);
+            console.log(`inserted ${result.insertedCount}`);
+            console.log(`modified ${result.modifiedCount}`);
         });
-    }
-    collection.bulkWrite(bulkUpdateOps).then((result) => {
-        console.log(`inserted ${result.insertedCount}`);
-        console.log(`deleted ${result.deletedCount}`);
-        console.log(`modified ${result.modifiedCount}`);
     });
 }
 
 async function fetchUpcomingEvents(game) {
     //use webscraper here.
     let gameEventList = await scrapeData(game);
-    updateCollection(gameEventList, game);
-
+    await updateCollection(gameEventList, game);
     return gameEventList;
 };
 
@@ -54,16 +51,16 @@ async function queryDatabase(gameName) {
         checkCollectionExist(gameName)
         .then(exists => {
             let collection = db.collection(gameName);
-            console.log(collection);
+            console.log(`${gameName} exists`);
             collection.find().toArray().then((docs, error) => {
                 if (error) reject(error);
                 if (docs) resolve(docs); 
             });
         })
         .catch(async doesNotExist => {
+           console.log(`${gameName} collection does not exist, creating...`);
            let gameEventList = await fetchUpcomingEvents(gameName);
            let collection = db.collection(gameName);
-           console.log(collection);
            collection.find().toArray().then((docs, error) => {
                if (error) reject(error);
                if (docs) resolve(docs);
@@ -78,7 +75,6 @@ function checkCollectionExist(gameName) {
     return new Promise((resolve, reject) => {
         db.listCollections({name: gameName })
             .next((error, collInfo) => {
-                console.log(error, collInfo);
                 if (collInfo) {
                     resolve(true);
                 } else {

@@ -1,6 +1,7 @@
 const associatedDomains = {
-    "https://www.hltv.org/": 'lol',
-    "https://www.dotabuff.com/": 'dota2'
+    "https://www.hltv.org/": 'csgo',
+    "https://www.dotabuff.com/": 'dota2',
+    "https://na.op.gg/": 'lol'
 };
 
 const LOCAL_SERVER_URL = 'http://localhost:3000';
@@ -10,6 +11,7 @@ let currentNotificationLink = 'https://juked.gg';
 
 chrome.webNavigation.onCompleted.addListener((tab) => {
     console.log('webNavigation onCompleted event fired');
+    console.log(tab.url);
     let gameName = associatedDomains[tab.url];
     if (tab.frameId === 0 && gameName) {
 
@@ -26,7 +28,7 @@ chrome.webNavigation.onCompleted.addListener((tab) => {
         });
     }
 
-}, { url: [{ hostContains: 'hltv'}, {hostContains: 'dotabuff'}]});
+}, { url: [{ hostContains: 'hltv'}, {hostContains: 'dotabuff'}, {hostContains: 'na.op'}]});
 
 
 chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
@@ -50,10 +52,11 @@ function storeAndNotify(gameName, eventData) {
             currentNotificationLink = stream.urlToStream;
             chrome.notifications.create('', {
                 type: 'image',
-                imageUrl: './images/jukedgg_icon.png',
+                imageUrl: './images/jukedgg_400_400.jpeg',
                 iconUrl: './images/jukedgg_icon.png',
                 title: `Live Stream for ${gameName}`,
-                message: 'Click to watch on JukedGG!',
+                message: `${stream.team1Name} VS ${stream.team2Name}`,
+                contextMessage: stream.eventNameAndPrize,
                 buttons: [
                     { title: 'Go to Stream'},
                     { title: 'Ignore'}

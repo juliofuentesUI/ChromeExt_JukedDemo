@@ -5,16 +5,16 @@ const { scrapeData } = require('./serverScraper.js');
 
 
 let db;
-let collection;
 initializeConnection();
 
 function initializeConnection() {
     const client = new MongoClient(URI, { useNewUrlParser: true, useUnifiedTopology: true });
     client.connect(error => {
-        console.log('Connected to MongoAtlas successfully');
+        console.log('Connected to MongoAtlasDB');
         db = client.db(DB_NAME);
         clearAllCollections(db).then(() => {
-            fetchUpcomingEvents('csgo')
+            fetchUpcomingEvents('csgo');
+            fetchUpcomingEvents('lol');
         })
     });
 }
@@ -34,7 +34,9 @@ function updateCollection(gameEventList, game) {
         });
     }
     collection.bulkWrite(bulkUpdateOps).then((result) => {
-        console.log('bulkUpdateOperation complete, the result is', result);
+        console.log(`inserted ${result.insertedCount}`);
+        console.log(`deleted ${result.deletedCount}`);
+        console.log(`modified ${result.modifiedCount}`);
     });
 }
 
@@ -46,7 +48,19 @@ async function fetchUpcomingEvents(game) {
     return gameEventList;
 };
 
+function queryDatabase(game) {
+    return new Promise((resolve, reject) => {
+        console.log('Querying database...')
+        let collection = db.collection(game);
+        collection.find().toArray().then((docs, error) => {
+            if (error) reject(error);
+            if (docs) resolve(docs); 
+        });
+    })
+};
+
 function clearAllCollections(db) {
+    console.log('Clearing all collections...');
     return new Promise((resolve, reject) => {
         db.collections((error, collections) => {
             collections.forEach(collection => {
@@ -61,7 +75,7 @@ function clearAllCollections(db) {
 };
 
 
-module.exports = { fetchUpcomingEvents }
+module.exports = { fetchUpcomingEvents , queryDatabase }
 
 
 

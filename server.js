@@ -17,15 +17,21 @@ app.all('/*',(req, res, next) => {
 
 
 app.get('/csgo', async (req, res) => {
-  // let output = await scrapeData('https://juked.gg/csgo');
-  let output = await db.fetchUpcomingEvents('csgo');
-  res.status(200).send(output);
+  let output = await db.queryDatabase('csgo');
+  if (!output) {
+    res.status(404).send('Data not found');
+  } else {
+    res.status(200).send(output);
+  }
 });
 
 app.get('/lol', async (req, res) => {
-  // let output = await scrapeData('https://juked.gg/lol');
-  let output = await db.fetchUpcomingEvents('lol');
-  res.status(200).send(output);
+  let output = await db.queryDatabase('lol');
+  if (!output) {
+    res.status(404).send('Data not found');
+  } else {
+    res.status(200).send(output);
+  }
 });
 
 let PORT = 3000;

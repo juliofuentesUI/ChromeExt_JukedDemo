@@ -43,7 +43,7 @@ const scrapeData = async (game) => {
 
 const traverseCalendar = (calendar) => {
   //DONT FORGET. THIS IS EXECUTING IN PAGE CONTEXT, NOT NODE CONTEXT because EVAL 
-  console.log('Function TraverseCalendar executing...');
+  console.log(' Traversing Calendar Nodes...');
   const eventDays = calendar.firstChild.children[1].children;
   const scrapedData = [];
   for (let day of eventDays) {

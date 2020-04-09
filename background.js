@@ -5,7 +5,7 @@ let associatedDomains = {
 
 const LOCAL_SERVER_URL = 'http://localhost:3000';
 let currentNotificationId = null;
-let currentNotificationLink = null;
+let currentNotificationLink = 'https://juked.gg';
 
 chrome.webNavigation.onCompleted.addListener((tab) => {
     //check to make sure its MAIN FRAME not subframe. mainframe is 0, rest are positive.
@@ -42,9 +42,14 @@ chrome.runtime.onSuspendCanceled.addListener(() => {
 
 chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
     console.log('A notification button was clicked');
+    console.log('buttonIndex is', buttonIndex);
+    console.log('notificationId : ', notificationId);
+    console.log('currentNotificationId : ', currentNotificationId);
     if (notificationId === currentNotificationId) {
         if (buttonIndex === 0) {
-            window.open(currentNotificationLink);
+            chrome.tabs.create({ 
+                url: currentNotificationLink
+            }, (Tab) => {console.log('User has been sent to stream');})
         }
     }
 });
@@ -57,16 +62,16 @@ function storeAndNotify(gameName, eventData) {
     //now create a notification.
     //filter through data and ONLY if you have live now games then notify.
     chrome.notifications.create('', {
-        type: "image",
-        imageUrl: 'urlGoesHere',
-        iconUrl: "./images/jukedgg_icon.png",
+        type: 'image',
+        imageUrl: './images/jukedgg_icon.png',
+        iconUrl: './images/jukedgg_icon.png',
         title: `Live Stream for ${gameName}`,
         message: 'Click to watch on JukedGG!',
         buttons: [
             { title: 'Go to Stream'},
             { title: 'Ignore'}
         ]
-    }, (id) => {});
+    }, (id) => { currentNotificationId = id});
 };
 
 
